@@ -1,0 +1,19 @@
+@model IList<ForumAPI.Services.BoardService.BoardModel>
+
+<html>
+<head>
+    <title></title>
+</head>
+<body>
+<div>
+    @{
+        foreach (var board in Model)
+        {
+            <div>
+                @board.Name
+            </div>
+        }
+    }
+</div>
+</body>
+</html>

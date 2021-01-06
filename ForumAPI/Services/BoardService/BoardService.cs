@@ -24,7 +24,7 @@ namespace ForumAPI.Services.BoardService
             return boardModels;
         }
 
-        private BoardModel MapToModel(Board board)
+        private static BoardModel MapToModel(Board board)
         {
             return new BoardModel
             {
@@ -50,7 +50,7 @@ namespace ForumAPI.Services.BoardService
             };
         }
 
-        private Board MapFromModel(BoardModel model)
+        private static Board MapFromModel(BoardModel model)
         {
             return new Board
             {
