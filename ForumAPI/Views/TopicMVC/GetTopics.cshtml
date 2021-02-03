@@ -1,0 +1,38 @@
+@model IEnumerable<ForumAPI.Services.BoardService.TopicModel>
+
+@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+
+<html>
+<head>
+    <title>title</title>
+</head>
+<body>
+@{
+        foreach (var topic in Model)
+        {
+            <div class="header">
+                <div>@topic.TopicHeader</div>
+                <div>@topic.Id</div>
+            </div>
+            
+            <div>
+            @{
+                var posts = topic.Posts?.Take(3);
+
+                foreach (var post in posts)
+                {
+                    <div class="footer-posts">
+                        <div>@post.Id</div>
+                        <div>@post.Text</div>
+                    </div>
+                }
+            }    
+            </div>
+        }
+    }
+</body>
+</html>
