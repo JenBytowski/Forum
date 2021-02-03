@@ -9,7 +9,7 @@ using Microsoft.Extensions.Logging;
 
 namespace ForumAPI
 {
-    public class Program
+    internal sealed class Program
     {
         public static void Main(string[] args)
         {

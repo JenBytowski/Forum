@@ -6,7 +6,12 @@ using Microsoft.EntityFrameworkCore;
 
 namespace ForumAPI.Services.BoardService
 {
-    public class BoardService
+    public interface IBoardService
+    {
+        public IList<BoardModel> GetBoards();
+    }
+    
+    internal sealed class BoardService : IBoardService
     {
         private BoardContext boardContext;
 
@@ -80,7 +85,7 @@ namespace ForumAPI.Services.BoardService
         }
     }
 
-    public class BoardModel
+    public sealed class BoardModel
     {
         public Guid Id { get; set; }
 
@@ -89,7 +94,7 @@ namespace ForumAPI.Services.BoardService
         public IList<TopicModel> Topics { get; set; }
     }
 
-    public class TopicModel
+    public sealed class TopicModel
     {
         public Guid Id { get; set; }
 
@@ -100,7 +105,7 @@ namespace ForumAPI.Services.BoardService
         public IList<PostModel> Posts { get; set; }
     }
 
-    public class PostModel
+    public sealed class PostModel
     {
         public Guid Id { get; set; }
 
@@ -111,7 +116,7 @@ namespace ForumAPI.Services.BoardService
         public IList<AdditionalPostInfoModel> AdditionalPostInfos { get; set; }
     }
 
-    public class AdditionalPostInfoModel
+    public sealed class AdditionalPostInfoModel
     {
         public Guid Id { get; set; }
 

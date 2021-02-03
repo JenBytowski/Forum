@@ -4,7 +4,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace ForumAPI.Services.BoardService.BoardDataContext
 {
-    public class BoardContext : DbContext
+    internal sealed class BoardContext : DbContext
     {
         public DbSet<Board> Boards { get; set; }
         
@@ -20,7 +20,7 @@ namespace ForumAPI.Services.BoardService.BoardDataContext
         }
     }
 
-    public class Board
+    internal sealed class Board
     {
         public Guid Id { get; set; }
         
@@ -29,7 +29,7 @@ namespace ForumAPI.Services.BoardService.BoardDataContext
         public IList<Topic> Topics { get; set; }
     }
 
-    public class Topic
+    internal sealed class Topic
     {
         public Guid Id { get; set; }
         
@@ -44,7 +44,7 @@ namespace ForumAPI.Services.BoardService.BoardDataContext
         public IList<Post> Posts { get; set; }
     }
 
-    public class Post
+    internal sealed class Post
     {
         public Guid Id { get; set; }
         
@@ -59,7 +59,7 @@ namespace ForumAPI.Services.BoardService.BoardDataContext
         public IList<AdditionalPostInfo> AdditionalPostInfos { get; set; }
     }
 
-    public class AdditionalPostInfo
+    internal sealed class AdditionalPostInfo
     {
         public Guid Id { get; set; }
         

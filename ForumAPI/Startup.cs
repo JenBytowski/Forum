@@ -9,7 +9,7 @@ using Microsoft.Extensions.Hosting;
 
 namespace ForumAPI
 {
-    public class Startup
+    internal sealed class Startup
     {
         private IConfiguration configuration;
 
@@ -26,7 +26,7 @@ namespace ForumAPI
             services.AddControllers();
             services.AddMvc();
 
-            services.AddScoped<BoardService>();
+            services.AddScoped<IBoardService,BoardService>();
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)

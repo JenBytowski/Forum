@@ -4,11 +4,12 @@ using Microsoft.AspNetCore.Mvc;
 namespace ForumAPI.Controllers
 {
     [Route("boards")]
+    [Controller]
     public sealed class BoardMVCController : Controller
     {
-        private readonly BoardService boardService;
+        private readonly IBoardService boardService;
         
-        public BoardMVCController(BoardService boardService)
+        public BoardMVCController(IBoardService boardService)
         {
             this.boardService = boardService;
         }
