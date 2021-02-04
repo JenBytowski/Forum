@@ -26,6 +26,8 @@ namespace ForumAPI.Services.BoardService.BoardDataContext
         
         public string Name { get; set; }
         
+        public string Alias { get; set; }
+        
         public IList<Topic> Topics { get; set; }
     }
 
