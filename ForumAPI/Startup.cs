@@ -23,11 +23,13 @@ namespace ForumAPI
         {
             services.AddDbContext<BoardContext>(options =>
                 options.UseSqlServer(configuration.GetConnectionString("BoardContext")));
-
+            
             services.AddControllers(conf => conf.Filters.Add<RequestCheckAsyncFilter>());
             services.AddMvc();
 
             services.AddScoped<IBoardService,BoardService>();
+            
+            services.AddSwaggerGen();
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
@@ -38,7 +40,14 @@ namespace ForumAPI
             }
 
             app.UseRouting();
-
+            
+            //swagger
+            app.UseSwagger();
+            app.UseSwaggerUI(opt =>
+            {
+                opt.SwaggerEndpoint("/swagger/v1/swagger.json", "api v1.0.0");
+            });
+            
             app.UseEndpoints(endpoints => { endpoints.MapControllers(); });
         }
     }
