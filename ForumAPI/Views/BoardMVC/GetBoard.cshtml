@@ -1,4 +1,4 @@
-@model IEnumerable<ForumAPI.Services.BoardService.TopicModel>
+@model ForumAPI.Services.BoardService.BoardModel
 
 @{
     Layout = null;
@@ -12,7 +12,7 @@
 </head>
 <body>
 @{
-        foreach (var topic in Model)
+        foreach (var topic in Model.Topics)
         {
             <div class="header">
                 <div>@topic.TopicHeader</div>

@@ -1,3 +1,4 @@
+using ForumAPI.Filters;
 using ForumAPI.Services.BoardService;
 using ForumAPI.Services.BoardService.BoardDataContext;
 using Microsoft.AspNetCore.Builder;
@@ -23,7 +24,7 @@ namespace ForumAPI
             services.AddDbContext<BoardContext>(options =>
                 options.UseSqlServer(configuration.GetConnectionString("BoardContext")));
 
-            services.AddControllers();
+            services.AddControllers(conf => conf.Filters.Add<RequestCheckAsyncFilter>());
             services.AddMvc();
 
             services.AddScoped<IBoardService,BoardService>();

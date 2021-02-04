@@ -12,7 +12,7 @@ namespace ForumAPI.Services.BoardService
     {
         IEnumerable<BoardModel> GetBoards();
 
-        Task<IEnumerable<TopicModel>> GetTopicsByBoard(string board);
+        Task<BoardModel> GetBoardByName(string board);
     }
 
     internal sealed class BoardService : IBoardService
@@ -32,12 +32,12 @@ namespace ForumAPI.Services.BoardService
             return boards;
         }
 
-        public async Task<IEnumerable<TopicModel>> GetTopicsByBoard(string board)
+        public async Task<BoardModel> GetBoardByName(string boardAlias)
         {
-            var topics = this.boardContext.Topics.Include(tp => tp.Board).Include(tp => tp.Posts).ThenInclude(pst => pst.AdditionalPostInfos);
-            var boardTopics = topics.Where(tp => tp.Board.Name == board).Select(tp => TopicModel.MapToModel(tp));
+            var boards = this.boardContext.Boards.Include(brd => brd.Topics).ThenInclude(top => top.Posts);
+            var board = await boards.SingleAsync(brd => brd.Alias == boardAlias);
 
-            return boardTopics;
+            return BoardModel.MapToModel(board);
         }
 
         
