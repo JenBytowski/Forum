@@ -11,15 +11,30 @@
     <title>title</title>
 </head>
 <body>
+<div>
+    <form method="post" action="~/boards">
+        <label for="TopicHeader">Topic name:</label>
+        <input type="text" name="TopicHeader">
+        
+        <label for="Text">Topic text:</label>
+        <input type="text" name="Text">
+        
+        <label for="AdditionalPostInfos">Topic images urls:</label>
+        <input type="text" name="AdditionalPostInfos">
+        
+        <input type="submit" value="post">
+        <input hidden="true" type="text" name="BoardId" value="@Model.Id">
+    </form>
+</div>
 @{
-        foreach (var topic in Model.Topics)
-        {
-            <div class="header">
-                <div>@topic.TopicHeader</div>
-                <div>@topic.Id</div>
-            </div>
-            
-            <div>
+    foreach (var topic in Model.Topics)
+    {
+        <div class="header">
+            <div>@topic.TopicHeader</div>
+            <div>@topic.Id</div>
+        </div>
+
+        <div>
             @{
                 var posts = topic.Posts?.Take(3);
 
@@ -30,9 +45,9 @@
                         <div>@post.Text</div>
                     </div>
                 }
-            }    
-            </div>
-        }
+            }
+        </div>
     }
+}
 </body>
 </html>

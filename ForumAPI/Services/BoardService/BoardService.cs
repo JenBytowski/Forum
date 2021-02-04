@@ -1,5 +1,4 @@
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -13,6 +12,8 @@ namespace ForumAPI.Services.BoardService
         IEnumerable<BoardModel> GetBoards();
 
         Task<BoardModel> GetBoardByName(string board);
+
+        Task CreateTopic(CreateTopicRequest request);
     }
 
     internal sealed class BoardService : IBoardService
@@ -40,7 +41,52 @@ namespace ForumAPI.Services.BoardService
             return BoardModel.MapToModel(board);
         }
 
+        public async Task CreateTopic(CreateTopicRequest request)
+        {
+            await this.boardContext.Boards.Where(brd => brd.Id == request.BoardId).LoadAsync();
+            
+            //some shit
+            var newTopicModel = CreateTopicRequest.MapToModel(request);
+            var newTopic = TopicModel.MapFromModel(newTopicModel);
+            
+            this.boardContext.Boards.Local.First(brd => brd.Id == request.BoardId).Topics.Add(newTopic);
+            await this.boardContext.SaveChangesAsync();
+        }
+    }
+
+    public sealed class CreateTopicRequest
+    {
+        public Guid BoardId { get; set; }
+
+        public Guid? CreaterId { get; set; }
+
+        public string TopicHeader { get; set; }
+
+        public string Text { get; set; }
+
+        public IEnumerable<string> AdditionalPostInfos { get; set; }
         
+        public static TopicModel MapToModel(CreateTopicRequest request)
+        {
+            return new TopicModel
+            {
+                BoardId = request.BoardId,
+                CreaterId = request.CreaterId != default ? request.CreaterId.Value : Guid.NewGuid(),
+                TopicHeader = request.TopicHeader,
+                Posts = new List<PostModel>
+                {
+                   new PostModel
+                   {
+                       PosterId = Guid.NewGuid(),
+                       Text = request.Text,
+                       AdditionalPostInfos = request.AdditionalPostInfos.Select(inf => new AdditionalPostInfoModel
+                       {
+                           ContentURL = inf
+                       }).ToList()
+                   }
+                }
+            };
+        }
     }
 
     public sealed class BoardModel
@@ -50,7 +96,7 @@ namespace ForumAPI.Services.BoardService
         public string Name { get; set; }
 
         public IList<TopicModel> Topics { get; set; }
-        
+
         internal static BoardModel MapToModel(Board board)
         {
             return new BoardModel
@@ -129,7 +175,8 @@ namespace ForumAPI.Services.BoardService
                 TopicId = post.TopicId,
                 PosterId = post.PosterId,
                 Text = post.Text,
-                AdditionalPostInfos = post.AdditionalPostInfos?.Select(inf => AdditionalPostInfoModel.MapToModel(inf)).ToList()
+                AdditionalPostInfos = post.AdditionalPostInfos?.Select(inf => AdditionalPostInfoModel.MapToModel(inf))
+                    .ToList()
             };
         }
 
@@ -141,7 +188,8 @@ namespace ForumAPI.Services.BoardService
                 TopicId = model.TopicId,
                 PosterId = model.PosterId,
                 Text = model.Text,
-                AdditionalPostInfos = model.AdditionalPostInfos?.Select(inf => AdditionalPostInfoModel.MapFromModel(inf)).ToList()
+                AdditionalPostInfos = model.AdditionalPostInfos
+                    ?.Select(inf => AdditionalPostInfoModel.MapFromModel(inf)).ToList()
             };
         }
     }
@@ -163,7 +211,7 @@ namespace ForumAPI.Services.BoardService
                 ContentURL = additionalPostInfo.ContentURL
             };
         }
-        
+
         internal static AdditionalPostInfo MapFromModel(AdditionalPostInfoModel additionalPostInfo)
         {
             return new AdditionalPostInfo
