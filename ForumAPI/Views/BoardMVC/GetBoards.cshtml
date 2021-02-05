@@ -1,19 +1,15 @@
 @model IEnumerable<ForumAPI.Services.BoardService.BoardModel>
+@{
+    Layout = "BaseLayout";
+}
 
-<html>
-<head>
-    <title></title>
-</head>
-<body>
 <div>
     @{
         foreach (var board in Model)
         {
             <div>
-                @board.Name
+                <a href="~/boards/@board.Alias">@board.Name</a>
             </div>
         }
     }
 </div>
-</body>
-</html>

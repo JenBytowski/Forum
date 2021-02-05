@@ -27,6 +27,7 @@ namespace ForumAPI
             services.AddControllers(conf => conf.Filters.Add<RequestCheckAsyncFilter>());
             services.AddMvc();
 
+            services.AddHttpClient();
             services.AddScoped<IBoardService,BoardService>();
             
             services.AddSwaggerGen();
@@ -40,6 +41,7 @@ namespace ForumAPI
             }
 
             app.UseRouting();
+            app.UseStaticFiles();
             
             //swagger
             app.UseSwagger();

@@ -1,0 +1,12 @@
+.flex-container-column{
+    display: flex;
+    flex-direction: column;
+    border: solid 2px;
+    background-color: yellow;
+}
+
+.flex-container-row{
+    display: flex;
+    flex-direction: row;
+    border: solid 2px;
+}
