@@ -40,6 +40,23 @@ namespace ForumAPI.Controllers
             }
         }
 
+        [HttpGet]
+        [Route("{boardAlias}/{topicId}")]
+        public async Task<IActionResult> GetTopic(string boardAlias, Guid topicId)
+        {
+            try
+            {
+                var topic = await this.boardService.GetTopic(new GetTopicRequest
+                    {BoardAlias = boardAlias, TopicId = topicId});
+
+                return View(topic);
+            }
+            catch (InvalidOperationException e)
+            {
+                return RedirectToAction(nameof(this.GetBoard), routeValues: boardAlias);
+            }
+        }
+
         [HttpPost]
         public async Task<IActionResult> CreateTopic([FromForm] CreateTopicRequest request)
         {

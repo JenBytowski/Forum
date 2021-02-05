@@ -1,0 +1,21 @@
+﻿@model ForumAPI.Services.BoardService.TopicModel
+
+<!DOCTYPE html>
+
+<html>
+<head>
+    <title>title</title>
+</head>
+<body>
+<h1>@Model.TopicHeader</h1>
+
+@{
+    foreach (var post in @Model.Posts)
+    {
+        <div>
+            @post.Text
+        </div>
+    }
+}
+</body>
+</html>

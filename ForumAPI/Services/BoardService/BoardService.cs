@@ -13,6 +13,8 @@ namespace ForumAPI.Services.BoardService
 
         Task<BoardModel> GetBoardByName(string board);
 
+        Task<TopicModel> GetTopic(GetTopicRequest request);
+
         Task CreateTopic(CreateTopicRequest request);
     }
 
@@ -41,17 +43,42 @@ namespace ForumAPI.Services.BoardService
             return BoardModel.MapToModel(board);
         }
 
+        public async Task<TopicModel> GetTopic(GetTopicRequest request)
+        {
+            await this.boardContext.Boards.Where(brd => brd.Alias == request.BoardAlias).LoadAsync();
+            var board = this.boardContext.Boards.Local.Single(brd => brd.Alias == request.BoardAlias);
+            await this.boardContext.Entry(board).Collection(brd => brd.Topics).LoadAsync();
+            var topic = board.Topics.Single(tp => tp.Id == request.TopicId);
+            await this.boardContext.Entry(topic).Collection(tp => tp.Posts).LoadAsync();
+
+            return TopicModel.MapToModel(topic);
+        }
+
         public async Task CreateTopic(CreateTopicRequest request)
         {
             await this.boardContext.Boards.Where(brd => brd.Id == request.BoardId).LoadAsync();
-            
+            var board = this.boardContext.Boards.Local.Single(brd => brd.Id == request.BoardId);
+            await this.boardContext.Entry(board).Collection(brd => brd.Topics).LoadAsync();
+
             //some shit
             var newTopicModel = CreateTopicRequest.MapToModel(request);
             var newTopic = TopicModel.MapFromModel(newTopicModel);
-            
-            this.boardContext.Boards.Local.First(brd => brd.Id == request.BoardId).Topics.Add(newTopic);
+
+            if (board.Topics == default)
+            {
+                throw new InvalidOperationException($"{board.Name} topics are null");
+            }
+
+            board.Topics.Add(newTopic);
             await this.boardContext.SaveChangesAsync();
         }
+    }
+
+    public sealed class GetTopicRequest
+    {
+        public string BoardAlias { get; set; }
+        
+        public Guid TopicId { get; set; }
     }
 
     public sealed class CreateTopicRequest
@@ -65,7 +92,7 @@ namespace ForumAPI.Services.BoardService
         public string Text { get; set; }
 
         public IEnumerable<string> AdditionalPostInfos { get; set; }
-        
+
         public static TopicModel MapToModel(CreateTopicRequest request)
         {
             return new TopicModel
@@ -75,15 +102,15 @@ namespace ForumAPI.Services.BoardService
                 TopicHeader = request.TopicHeader,
                 Posts = new List<PostModel>
                 {
-                   new PostModel
-                   {
-                       PosterId = Guid.NewGuid(),
-                       Text = request.Text,
-                       AdditionalPostInfos = request.AdditionalPostInfos.Select(inf => new AdditionalPostInfoModel
-                       {
-                           ContentURL = inf
-                       }).ToList()
-                   }
+                    new PostModel
+                    {
+                        PosterId = Guid.NewGuid(),
+                        Text = request.Text,
+                        AdditionalPostInfos = request.AdditionalPostInfos.Select(inf => new AdditionalPostInfoModel
+                        {
+                            ContentURL = inf
+                        }).ToList()
+                    }
                 }
             };
         }
@@ -94,7 +121,9 @@ namespace ForumAPI.Services.BoardService
         public Guid Id { get; set; }
 
         public string Name { get; set; }
-
+        
+        public string Alias { get; set; }
+        
         public IList<TopicModel> Topics { get; set; }
 
         internal static BoardModel MapToModel(Board board)
@@ -103,6 +132,7 @@ namespace ForumAPI.Services.BoardService
             {
                 Id = board.Id,
                 Name = board.Name,
+                Alias = board.Alias,
                 Topics = board.Topics?.Select(top => TopicModel.MapToModel(top)).ToList()
             };
         }
