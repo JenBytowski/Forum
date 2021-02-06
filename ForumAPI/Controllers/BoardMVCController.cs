@@ -17,6 +17,7 @@ namespace ForumAPI.Controllers
         }
 
         [HttpGet]
+        [ApiExplorerSettings(GroupName = "boards")]
         public IActionResult GetBoards()
         {
             var boards = boardService.GetBoards();
@@ -26,6 +27,7 @@ namespace ForumAPI.Controllers
 
         [HttpGet]
         [Route("{boardAlias}")]
+        [ApiExplorerSettings(GroupName = "boards")]
         public async Task<IActionResult> GetBoard([FromRoute] string boardAlias)
         {
             try
@@ -42,6 +44,7 @@ namespace ForumAPI.Controllers
 
         [HttpGet]
         [Route("{boardAlias}/{topicId}")]
+        [ApiExplorerSettings(GroupName = "topics")]
         public async Task<IActionResult> GetTopic(string boardAlias, Guid topicId)
         {
             try
@@ -59,6 +62,7 @@ namespace ForumAPI.Controllers
 
         [HttpPost]
         [Route("{boardAlias}")]
+        [ApiExplorerSettings(GroupName = "topics")]
         public async Task<IActionResult> CreateTopic([FromRoute]string boardAlias, [FromForm]CreateTopicRequest request)
         {
             request.BoardAlias = boardAlias;

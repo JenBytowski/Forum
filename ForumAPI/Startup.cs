@@ -7,6 +7,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.OpenApi.Models;
 
 namespace ForumAPI
 {
@@ -30,7 +31,12 @@ namespace ForumAPI
             services.AddHttpClient();
             services.AddScoped<IBoardService,BoardService>();
             
-            services.AddSwaggerGen();
+            services.AddSwaggerGen(opt =>
+            {
+                opt.SwaggerDoc("boards", new OpenApiInfo {Title = "Boards", Version = "1.0.0"});
+                opt.SwaggerDoc("topics", new OpenApiInfo {Title = "Topics", Version = "1.0.0"});
+                opt.SwaggerDoc("posts", new OpenApiInfo {Title = "Posts", Version = "1.0.0"});
+            });
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
@@ -47,7 +53,9 @@ namespace ForumAPI
             app.UseSwagger();
             app.UseSwaggerUI(opt =>
             {
-                opt.SwaggerEndpoint("/swagger/v1/swagger.json", "api v1.0.0");
+                opt.SwaggerEndpoint("/swagger/boards/swagger.json", "boards");
+                opt.SwaggerEndpoint("/swagger/topics/swagger.json", "topics");
+                opt.SwaggerEndpoint("/swagger/posts/swagger.json", "posts");
             });
             
             app.UseEndpoints(endpoints => { endpoints.MapControllers(); });
