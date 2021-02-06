@@ -58,8 +58,10 @@ namespace ForumAPI.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> CreateTopic([FromForm] CreateTopicRequest request)
+        [Route("{boardAlias}")]
+        public async Task<IActionResult> CreateTopic([FromRoute]string boardAlias, [FromForm]CreateTopicRequest request)
         {
+            request.BoardAlias = boardAlias;
             await this.boardService.CreateTopic(request);
 
             return RedirectToAction(nameof(this.GetBoards));

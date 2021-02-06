@@ -54,20 +54,42 @@ namespace ForumAPI.Services.BoardService
             return TopicModel.MapToModel(topic);
         }
 
+        //TODO fix this crap
         public async Task CreateTopic(CreateTopicRequest request)
         {
-            await this.boardContext.Boards.Where(brd => brd.Id == request.BoardId).LoadAsync();
-            var board = this.boardContext.Boards.Local.Single(brd => brd.Id == request.BoardId);
-            await this.boardContext.Entry(board).Collection(brd => brd.Topics).LoadAsync();
+            if (request.BoardId == default && request.BoardAlias == default)
+            {
+                throw new InvalidOperationException("board id and alias are null");
+            }
 
-            //some shit
-            var newTopicModel = CreateTopicRequest.MapToModel(request);
-            var newTopic = TopicModel.MapFromModel(newTopicModel);
+            await this.boardContext.Boards.Where(brd => brd.Id == request.BoardId || brd.Alias == request.BoardAlias)
+                .LoadAsync();
+
+            var board = request.BoardId != default
+                ? this.boardContext.Boards.Local.Single(brd => brd.Id == request.BoardId)
+                : this.boardContext.Boards.Local.Single(brd => brd.Alias == request.BoardAlias);
+
+            if ((request.BoardId != default && request.BoardId != board.Id) ||
+                (request.BoardAlias != default && request.BoardAlias != board.Alias))
+            {
+                throw new InvalidOperationException("board id and alias are mismatch");
+            }
+            
+            await this.boardContext.Entry(board).Collection(brd => brd.Topics).LoadAsync();
 
             if (board.Topics == default)
             {
                 throw new InvalidOperationException($"{board.Name} topics are null");
             }
+
+            if (request.BoardId == default)
+            {
+                request.BoardId = board.Id;
+            }
+            
+            //some shit
+            var newTopicModel = CreateTopicRequest.MapToModel(request);
+            var newTopic = TopicModel.MapFromModel(newTopicModel);
 
             board.Topics.Add(newTopic);
             await this.boardContext.SaveChangesAsync();
@@ -77,13 +99,15 @@ namespace ForumAPI.Services.BoardService
     public sealed class GetTopicRequest
     {
         public string BoardAlias { get; set; }
-        
+
         public Guid TopicId { get; set; }
     }
 
     public sealed class CreateTopicRequest
     {
-        public Guid BoardId { get; set; }
+        public Guid? BoardId { get; set; }
+
+        public string BoardAlias { get; set; }
 
         public Guid? CreaterId { get; set; }
 
@@ -97,7 +121,7 @@ namespace ForumAPI.Services.BoardService
         {
             return new TopicModel
             {
-                BoardId = request.BoardId,
+                BoardId = request.BoardId.Value,
                 CreaterId = request.CreaterId != default ? request.CreaterId.Value : Guid.NewGuid(),
                 TopicHeader = request.TopicHeader,
                 Posts = new List<PostModel>
@@ -121,9 +145,9 @@ namespace ForumAPI.Services.BoardService
         public Guid Id { get; set; }
 
         public string Name { get; set; }
-        
+
         public string Alias { get; set; }
-        
+
         public IList<TopicModel> Topics { get; set; }
 
         internal static BoardModel MapToModel(Board board)
