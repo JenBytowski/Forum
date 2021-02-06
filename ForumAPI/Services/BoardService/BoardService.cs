@@ -16,6 +16,12 @@ namespace ForumAPI.Services.BoardService
         Task<TopicModel> GetTopic(GetTopicRequest request);
 
         Task CreateTopic(CreateTopicRequest request);
+
+        Task CreatePost(CreatePostRequest request);
+
+        Task RefactorPost(RefactorPostRequest request);
+
+        Task RemovePost(Guid postId);
     }
 
     internal sealed class BoardService : IBoardService
@@ -94,6 +100,21 @@ namespace ForumAPI.Services.BoardService
             board.Topics.Add(newTopic);
             await this.boardContext.SaveChangesAsync();
         }
+
+        public Task CreatePost(CreatePostRequest request)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task RefactorPost(RefactorPostRequest request)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task RemovePost(Guid postId)
+        {
+            throw new NotImplementedException();
+        }
     }
 
     public sealed class GetTopicRequest
@@ -138,6 +159,27 @@ namespace ForumAPI.Services.BoardService
                 }
             };
         }
+    }
+    
+    public sealed class CreatePostRequest
+    {
+        public Guid TopicId { get; set; }
+        
+        public Guid PosterId { get; set; }
+        
+        public string Text { get; set; }
+        
+        public IEnumerable<string> AdditionalPostInfo { get; set; }
+    }
+    
+    
+    public sealed class RefactorPostRequest
+    {
+        public Guid PostId { get; set; }
+        
+        public string Text { get; set; }
+        
+        public IEnumerable<string> AdditionalPostInfo { get; set; }
     }
 
     public sealed class BoardModel
