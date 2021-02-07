@@ -63,12 +63,45 @@ namespace ForumAPI.Controllers
         [HttpPost]
         [Route("{boardAlias}")]
         [ApiExplorerSettings(GroupName = "topics")]
-        public async Task<IActionResult> CreateTopic([FromRoute]string boardAlias, [FromForm]CreateTopicRequest request)
+        public async Task<IActionResult> CreateTopic([FromRoute] string boardAlias,
+            [FromForm] CreateTopicRequest request)
         {
             request.BoardAlias = boardAlias;
             await this.boardService.CreateTopic(request);
 
             return RedirectToAction(nameof(this.GetBoards));
+        }
+
+        [HttpPost]
+        [Route("{boardAlias}/{topicId}")]
+        [ApiExplorerSettings(GroupName = "posts")]
+        public async Task<IActionResult> CreatePost([FromRoute] string boardAlias, [FromBody] CreatePostRequest request)
+        {
+            await this.boardService.CreatePost(request);
+
+            return RedirectToAction(nameof(this.GetTopic), new {boardAlias = boardAlias, topicId = request.TopicId});
+        }
+
+        [HttpPut]
+        [Route("{boardAlias}/{topicId}")]
+        [ApiExplorerSettings(GroupName = "posts")]
+        public async Task<IActionResult> RefactorPost([FromRoute] string boardAlias, [FromRoute] Guid topicId,
+            [FromBody] RefactorPostRequest request)
+        {
+            await this.boardService.RefactorPost(request);
+
+            return RedirectToAction("GetTopic", new {boardAlias = boardAlias, topicId = topicId});
+        }
+
+        [HttpDelete]
+        [Route("{boardAlias}/{topicId}/{postId}")]
+        [ApiExplorerSettings(GroupName = "posts")]
+        public async Task<IActionResult> DeletePost([FromRoute] string boardAlias, [FromRoute] Guid topicId,
+            [FromRoute] Guid postId)
+        {
+            await this.boardService.RemovePost(postId);
+
+            return RedirectToAction(nameof(this.GetTopic), new {boardAlias = boardAlias, topicId = topicId});
         }
     }
 }

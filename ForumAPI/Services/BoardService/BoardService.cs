@@ -80,7 +80,7 @@ namespace ForumAPI.Services.BoardService
             {
                 throw new InvalidOperationException("board id and alias are mismatch");
             }
-            
+
             await this.boardContext.Entry(board).Collection(brd => brd.Topics).LoadAsync();
 
             if (board.Topics == default)
@@ -92,7 +92,7 @@ namespace ForumAPI.Services.BoardService
             {
                 request.BoardId = board.Id;
             }
-            
+
             //some shit
             var newTopicModel = CreateTopicRequest.MapToModel(request);
             var newTopic = TopicModel.MapFromModel(newTopicModel);
@@ -101,19 +101,48 @@ namespace ForumAPI.Services.BoardService
             await this.boardContext.SaveChangesAsync();
         }
 
-        public Task CreatePost(CreatePostRequest request)
+        public async Task CreatePost(CreatePostRequest request)
         {
-            throw new NotImplementedException();
+            if (request.TopicId == default)
+            {
+                throw new InvalidOperationException("topic id is invalid");
+            }
+
+            await this.boardContext.Topics.Where(tp => tp.Id == request.TopicId).LoadAsync();
+            var topic = this.boardContext.Topics.Local.Single(tp => tp.Id == request.TopicId);
+            await this.boardContext.Entry(topic).Collection(tp => tp.Posts).LoadAsync();
+
+            var postModel = CreatePostRequest.MapToModel(request);
+            var post = PostModel.MapFromModel(postModel);
+            topic.Posts.Add(post);
+            await this.boardContext.SaveChangesAsync();
         }
 
-        public Task RefactorPost(RefactorPostRequest request)
+        public async Task RefactorPost(RefactorPostRequest request)
         {
-            throw new NotImplementedException();
+            await this.boardContext.Posts.Where(pst => pst.Id == request.PostId).LoadAsync();
+            var post = this.boardContext.Posts.Single(pst => pst.Id == request.PostId);
+            await this.boardContext.Entry(post).Collection(pst => pst.AdditionalPostInfos).LoadAsync();
+            var postModel = PostModel.MapToModel(post);
+
+            postModel.Text = request.Text ?? postModel.Text;
+            postModel.AdditionalPostInfos = request.AdditionalPostInfo?.Select(add => new AdditionalPostInfoModel
+            {
+                ContentURL = add
+            }).ToList() ?? postModel.AdditionalPostInfos;
+            
+            this.boardContext.ChangeTracker.Clear();
+            this.boardContext.Update(PostModel.MapFromModel(postModel));
+            await this.boardContext.SaveChangesAsync();
         }
 
-        public Task RemovePost(Guid postId)
+        public async Task RemovePost(Guid postId)
         {
-            throw new NotImplementedException();
+            await this.boardContext.Posts.Where(pst => pst.Id == postId).LoadAsync();
+            var post = this.boardContext.Posts.Single(pst => pst.Id == postId);
+
+            this.boardContext.Posts.Remove(post);
+            await this.boardContext.SaveChangesAsync();
         }
     }
 
@@ -160,25 +189,37 @@ namespace ForumAPI.Services.BoardService
             };
         }
     }
-    
+
     public sealed class CreatePostRequest
     {
         public Guid TopicId { get; set; }
-        
-        public Guid PosterId { get; set; }
-        
+
+        public Guid? PosterId { get; set; }
+
         public string Text { get; set; }
-        
+
         public IEnumerable<string> AdditionalPostInfo { get; set; }
+
+        public static PostModel MapToModel(CreatePostRequest request)
+        {
+            return new PostModel
+            {
+                PosterId = request.PosterId != default ? request.PosterId.Value : Guid.NewGuid(),
+                TopicId = request.TopicId,
+                Text = request.Text,
+                AdditionalPostInfos = request.AdditionalPostInfo
+                    .Select(add => new AdditionalPostInfoModel {ContentURL = add}).ToList()
+            };
+        }
     }
-    
-    
+
+
     public sealed class RefactorPostRequest
     {
         public Guid PostId { get; set; }
-        
+
         public string Text { get; set; }
-        
+
         public IEnumerable<string> AdditionalPostInfo { get; set; }
     }
 
