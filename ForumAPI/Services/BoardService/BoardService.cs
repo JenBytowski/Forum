@@ -57,7 +57,7 @@ namespace ForumAPI.Services.BoardService
             var topic = board.Topics.Single(tp => tp.Id == request.TopicId);
             await this.boardContext.Entry(topic).Collection(tp => tp.Posts).LoadAsync();
 
-            return TopicModel.MapToModel(topic);
+            return TopicModel.MapToModel(topic, board);
         }
 
         //TODO fix this crap
@@ -260,6 +260,8 @@ namespace ForumAPI.Services.BoardService
         public Guid Id { get; set; }
 
         public Guid BoardId { get; set; }
+        
+        public string BoardAlias { get; set; }
 
         public Guid CreaterId { get; set; }
 
@@ -267,12 +269,13 @@ namespace ForumAPI.Services.BoardService
 
         public IList<PostModel> Posts { get; set; }
 
-        internal static TopicModel MapToModel(Topic topic)
+        internal static TopicModel MapToModel(Topic topic, Board board = null)
         {
             return new TopicModel()
             {
                 Id = topic.Id,
                 BoardId = topic.BoardId,
+                BoardAlias = board?.Alias,
                 TopicHeader = topic.TopicHeader,
                 CreaterId = topic.CreaterId,
                 Posts = topic.Posts?.Select(pst => PostModel.MapToModel(pst)).ToList()

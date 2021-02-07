@@ -75,22 +75,24 @@ namespace ForumAPI.Controllers
         [HttpPost]
         [Route("{boardAlias}/{topicId}")]
         [ApiExplorerSettings(GroupName = "posts")]
-        public async Task<IActionResult> CreatePost([FromRoute] string boardAlias, [FromBody] CreatePostRequest request)
+        public async Task<IActionResult> CreatePost([FromRoute] string boardAlias, [FromForm] CreatePostRequest request)
         {
             await this.boardService.CreatePost(request);
 
             return RedirectToAction(nameof(this.GetTopic), new {boardAlias = boardAlias, topicId = request.TopicId});
         }
 
+        //TODO разобраться с этой херней
         [HttpPut]
         [Route("{boardAlias}/{topicId}")]
         [ApiExplorerSettings(GroupName = "posts")]
         public async Task<IActionResult> RefactorPost([FromRoute] string boardAlias, [FromRoute] Guid topicId,
-            [FromBody] RefactorPostRequest request)
+            [FromForm] RefactorPostRequest request)
         {
             await this.boardService.RefactorPost(request);
 
-            return RedirectToAction("GetTopic", new {boardAlias = boardAlias, topicId = topicId});
+            // return RedirectToAction(nameof(this.GetTopic), new {boardAlias = boardAlias, topicId = topicId});
+            return null;
         }
 
         [HttpDelete]

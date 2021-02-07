@@ -5,6 +5,21 @@
 <html>
 <head>
     <title>title</title>
+    
+    <script>
+    function sendPUTRequest() {
+        let request = new XMLHttpRequest();
+        let formData = new FormData(putForm);
+        
+        request.open("PUT","https://localhost:5001/boards/@Model.BoardAlias/@Model.Id", false);
+        request.send(formData);
+        
+        if (request.status != 200)
+        {
+                console.log(`${request.statusText} ${formData}`)
+        }
+    }
+    </script>
 </head>
 <body>
 <h1>@Model.TopicHeader</h1>
@@ -15,7 +30,23 @@
         <div>
             @post.Text
         </div>
+        <form id="putForm">
+            <input type="text" name="PostId" hidden="true" value="@post.Id">
+            <label for="Text">Post Text:</label>
+            <input type="text" name="Text">
+            <label for="AdditionalPostInfo">Post images:</label>
+            <input type="text" name="AdditionalPostInfo">
+            <input type="submit" onclick="sendPUTRequest()">
+        </form>
     }
 }
+<form action="~/boards/@Model.BoardAlias/@Model.Id" method="post">
+    <input type="text" name="TopicId" hidden="true" value="@Model.Id">
+    <label for="Text">Post Text:</label>
+    <input type="text" name="Text">
+    <label for="AdditionalPostInfo">Post images:</label>
+    <input type="text" name="AdditionalPostInfo">
+    <input type="submit">
+</form>
 </body>
 </html>
