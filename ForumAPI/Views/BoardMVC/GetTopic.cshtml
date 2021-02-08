@@ -7,17 +7,21 @@
     <title>title</title>
     
     <script>
-    function sendPUTRequest() {
-        let request = new XMLHttpRequest();
-        let formData = new FormData(putForm);
-        
-        request.open("PUT","https://localhost:5001/boards/@Model.BoardAlias/@Model.Id", false);
-        request.send(formData);
-        
-        if (request.status != 200)
-        {
-                console.log(`${request.statusText} ${formData}`)
-        }
+    function sendFormData(httpMethod, url, formId)
+    {
+       let formData = new FormData(document.getElementById(formId));
+       
+       for (var value of formData.values()) {
+          console.log(value);
+       }
+       
+       let request = new XMLHttpRequest();
+           fetch(url, {
+               method: httpMethod,
+               body: formData
+           }).then(rs => {
+               window.location.replace('@Url.Content("~")/boards/@Model.BoardAlias/@Model.Id');
+           })
     }
     </script>
 </head>
@@ -25,19 +29,23 @@
 <h1>@Model.TopicHeader</h1>
 
 @{
+    var formCounter = default(int);
+    
     foreach (var post in @Model.Posts)
     {
         <div>
             @post.Text
         </div>
-        <form id="putForm">
+        <form id="@formCounter-refactor-form">
             <input type="text" name="PostId" hidden="true" value="@post.Id">
             <label for="Text">Post Text:</label>
             <input type="text" name="Text">
             <label for="AdditionalPostInfo">Post images:</label>
             <input type="text" name="AdditionalPostInfo">
-            <input type="submit" onclick="sendPUTRequest()">
+            <input type="button" value="Submit" onclick="sendFormData('PUT', '@Url.Content("~")/boards/@Model.BoardAlias/@Model.Id', '@formCounter-refactor-form')">
         </form>
+        
+        formCounter++;
     }
 }
 <form action="~/boards/@Model.BoardAlias/@Model.Id" method="post">

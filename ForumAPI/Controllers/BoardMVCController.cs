@@ -1,4 +1,5 @@
 using System;
+using System.Net;
 using System.Threading.Tasks;
 using ForumAPI.Services.BoardService;
 using Microsoft.AspNetCore.Mvc;
@@ -81,8 +82,7 @@ namespace ForumAPI.Controllers
 
             return RedirectToAction(nameof(this.GetTopic), new {boardAlias = boardAlias, topicId = request.TopicId});
         }
-
-        //TODO разобраться с этой херней
+        
         [HttpPut]
         [Route("{boardAlias}/{topicId}")]
         [ApiExplorerSettings(GroupName = "posts")]
@@ -91,8 +91,7 @@ namespace ForumAPI.Controllers
         {
             await this.boardService.RefactorPost(request);
 
-            // return RedirectToAction(nameof(this.GetTopic), new {boardAlias = boardAlias, topicId = topicId});
-            return null;
+            return StatusCode((int) HttpStatusCode.NoContent);
         }
 
         [HttpDelete]
