@@ -5,24 +5,18 @@
 <html>
 <head>
     <title>title</title>
-    
-    <script>
-    function sendFormData(httpMethod, url, formId)
+
+    <script> 
+    function sendRequestAndRedirect(httpMethod, url, urlToRedirect, body)
     {
-       let formData = new FormData(document.getElementById(formId));
-       
-       for (var value of formData.values()) {
-          console.log(value);
-       }
-       
-       let request = new XMLHttpRequest();
+         let request = new XMLHttpRequest();
            fetch(url, {
                method: httpMethod,
-               body: formData
+               body: body ?? ''
            }).then(rs => {
-               window.location.replace('@Url.Content("~")/boards/@Model.BoardAlias/@Model.Id');
+               window.location.replace(urlToRedirect);
            })
-    }
+        }
     </script>
 </head>
 <body>
@@ -30,7 +24,7 @@
 
 @{
     var formCounter = default(int);
-    
+
     foreach (var post in @Model.Posts)
     {
         <div>
@@ -42,9 +36,12 @@
             <input type="text" name="Text">
             <label for="AdditionalPostInfo">Post images:</label>
             <input type="text" name="AdditionalPostInfo">
-            <input type="button" value="Submit" onclick="sendFormData('PUT', '@Url.Content("~")/boards/@Model.BoardAlias/@Model.Id', '@formCounter-refactor-form')">
+            <input type="button" value="Submit" onclick="sendRequestAndRedirect('PUT', '@Url.Content("~")/boards/@Model.BoardAlias/@Model.Id', '@Url.Content("~")/boards/@Model.BoardAlias/@Model.Id', new FormData(document.getElementById('@formCounter-refactor-form')))">
         </form>
-        
+        <div>
+            <input type="button" value="Delete " onclick="sendRequestAndRedirect('DELETE','@Url.Content("~")/boards/@Model.BoardAlias/@Model.Id/@post.Id', '@Url.Content("~")/boards/@Model.BoardAlias/@Model.Id', undefined)">
+        </div>
+
         formCounter++;
     }
 }
