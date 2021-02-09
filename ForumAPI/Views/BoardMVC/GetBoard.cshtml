@@ -1,7 +1,7 @@
 @model ForumAPI.Services.BoardService.BoardModel
 
 @{
-    Layout = "BaseLayout";
+    //Layout = "BaseLayout";
 }
 
 <!DOCTYPE html>
@@ -9,45 +9,61 @@
 <html>
 <head>
     <title>title</title>
+    <link rel="stylesheet" type="text/css" href="~/get-board.css">
+    
+    <script>
+    function changeDisplay(element)
+    {
+        element.style.display = element.style.display == 'none' 
+        ? 'block'
+        :  'none';
+    }
+    </script>
 </head>
 <body>
+<button class="create-topic-button" onclick="changeDisplay(document.getElementById('topic-create-form'))">Create topic</button>
 <div>
-    <form method="post" action="~/boards/@Model.Alias">
+    <form id="topic-create-form" class="create-topic-form" method="post" action="~/boards/@Model.Alias">
+        <input style="display: none" type="text" name="BoardId" value="@Model.Id">
         <label for="TopicHeader">Topic name:</label>
         <input type="text" name="TopicHeader">
-        
+
         <label for="Text">Topic text:</label>
         <input type="text" name="Text">
-        
+
         <label for="AdditionalPostInfos">Topic images urls:</label>
         <input type="text" name="AdditionalPostInfos">
-        
+
         <input type="submit" value="post">
-        <input hidden="true" type="text" name="BoardId" value="@Model.Id">
     </form>
 </div>
 @{
     foreach (var topic in Model.Topics)
     {
-        <div class="header">
-            <div>@topic.TopicHeader</div>
-            <div>@topic.Id</div>
-            <div><a href="~/boards/@Model.Alias/@topic.Id">Enter topic</a></div>
-        </div>
+        <div class="topic">
+            <div class="topic-header">
+                <div class="topic-header-element">@topic.TopicHeader</div>
+                <div class="topic-header-element">@topic.Id</div>
+                <div class="topic-header-element">
+                    <a href="~/boards/@Model.Alias/@topic.Id">Enter topic</a>
+                </div>
+            </div>
+            <div class="topic-footer">
+                @{
+                    var posts = topic.Posts?.Take(3);
 
-        <div>
-            @{
-                var posts = topic.Posts?.Take(3);
-
-                foreach (var post in posts)
-                {
-                    <div class="footer-posts">
-                        <div>@post.Id</div>
-                        <div>@post.Text</div>
-                        <div></div>
-                    </div>
+                    foreach (var post in posts)
+                    {
+                        <div class="topic-footer-post">
+                            <div class="post-element">@post.Id</div>
+                            <div class="post-element">@post.Text</div>
+                            <div class="post-element">
+                                <img src="@post.AdditionalPostInfos?.First().ContentURL">
+                            </div>
+                        </div>
+                    }
                 }
-            }
+            </div>
         </div>
     }
 }

@@ -10,3 +10,12 @@
     flex-direction: row;
     border: solid 2px;
 }
+
+html, body {
+    height: 100%;
+}
+
+.layout-footer{
+    height: 100%;
+    
+}
