@@ -24,8 +24,13 @@ namespace ForumAPI
         {
             services.AddDbContext<BoardContext>(options =>
                 options.UseSqlServer(configuration.GetConnectionString("BoardContext")));
+
+            services.AddControllers(conf =>
+            {
+                conf.Filters.Add<RequestCheckFilter>();
+                conf.Filters.Add<ExceptionHandlingFilterAsync>();
+            });
             
-            services.AddControllers(conf => conf.Filters.Add<RequestCheckAsyncFilter>());
             services.AddMvc();
 
             services.AddHttpClient();

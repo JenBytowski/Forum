@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Mvc.Filters;
 
 namespace ForumAPI.Filters
 {
-    public sealed class RequestCheckAsyncFilter : IResourceFilter
+    public sealed class RequestCheckFilter : IResourceFilter
     {
         public void OnResourceExecuted(ResourceExecutedContext context)
         {
