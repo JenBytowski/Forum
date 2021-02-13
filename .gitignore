@@ -4,3 +4,4 @@ obj/
 /packages/
 riderModule.iml
 /_ReSharper.Caches/
+./ForumAPI/static-files/log

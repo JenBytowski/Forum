@@ -1,4 +1,6 @@
+using System;
 using ForumAPI.Filters;
+using ForumAPI.Services;
 using ForumAPI.Services.BoardService;
 using ForumAPI.Services.BoardService.BoardDataContext;
 using Microsoft.AspNetCore.Builder;
@@ -7,6 +9,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
 using Microsoft.OpenApi.Models;
 
 namespace ForumAPI
@@ -44,12 +47,14 @@ namespace ForumAPI
             });
         }
 
-        public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
+        public void Configure(IApplicationBuilder app, IWebHostEnvironment env, ILoggerFactory loggerFactory)
         {
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
             }
+            
+            loggerFactory.AddProvider(new FileLoggerProvider($"log-{DateTime.Today.ToString("yy-MM-dd")}.txt"));
 
             app.UseRouting();
             app.UseStaticFiles();
