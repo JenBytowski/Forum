@@ -11,11 +11,19 @@ namespace ForumAPI.Services.BoardService
     {
         IEnumerable<BoardModel> GetBoards();
 
+        Task<BoardModel> GetBoard(Guid id);
+
         Task<BoardModel> GetBoardByName(string board);
+
+        Task CreateBoard(CreateBoardRequest request);
+
+        Task DeleteBoard(Guid id);
 
         Task<TopicModel> GetTopic(GetTopicRequest request);
 
         Task CreateTopic(CreateTopicRequest request);
+
+        Task DeleteTopic(Guid id);
 
         Task CreatePost(CreatePostRequest request);
 
@@ -41,12 +49,27 @@ namespace ForumAPI.Services.BoardService
             return boards;
         }
 
+        public Task<BoardModel> GetBoard(Guid id)
+        {
+            throw new NotImplementedException();
+        }
+
         public async Task<BoardModel> GetBoardByName(string boardAlias)
         {
             var boards = this.boardContext.Boards.Include(brd => brd.Topics).ThenInclude(top => top.Posts);
             var board = await boards.SingleAsync(brd => brd.Alias == boardAlias);
 
             return BoardModel.MapToModel(board);
+        }
+
+        public Task CreateBoard(CreateBoardRequest request)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task DeleteBoard(Guid id)
+        {
+            throw new NotImplementedException();
         }
 
         public async Task<TopicModel> GetTopic(GetTopicRequest request)
@@ -101,6 +124,11 @@ namespace ForumAPI.Services.BoardService
             await this.boardContext.SaveChangesAsync();
         }
 
+        public Task DeleteTopic(Guid id)
+        {
+            throw new NotImplementedException();
+        }
+
         public async Task CreatePost(CreatePostRequest request)
         {
             if (request.TopicId == default)
@@ -130,7 +158,7 @@ namespace ForumAPI.Services.BoardService
             {
                 ContentURL = add
             }).ToList() ?? postModel.AdditionalPostInfos;
-            
+
             this.boardContext.ChangeTracker.Clear();
             this.boardContext.Update(PostModel.MapFromModel(postModel));
             await this.boardContext.SaveChangesAsync();
@@ -151,6 +179,23 @@ namespace ForumAPI.Services.BoardService
         public string BoardAlias { get; set; }
 
         public Guid TopicId { get; set; }
+    }
+
+    public sealed class CreateBoardRequest
+    {
+        public string Name { get; set; }
+
+        public string Alias { get; set; }
+
+        public static BoardModel MapToModel(CreateBoardRequest request)
+        {
+            return new BoardModel
+            {
+                Id = Guid.NewGuid(),
+                Alias = request.Alias,
+                Name = request.Name,
+            };
+        }
     }
 
     public sealed class CreateTopicRequest
@@ -213,7 +258,6 @@ namespace ForumAPI.Services.BoardService
         }
     }
 
-
     public sealed class RefactorPostRequest
     {
         public Guid PostId { get; set; }
@@ -260,7 +304,7 @@ namespace ForumAPI.Services.BoardService
         public Guid Id { get; set; }
 
         public Guid BoardId { get; set; }
-        
+
         public string BoardAlias { get; set; }
 
         public Guid CreaterId { get; set; }
